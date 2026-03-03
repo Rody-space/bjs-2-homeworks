@@ -39,7 +39,7 @@ function solveEquation(a, b, c) {
  * @returns {number} общая сумма, которую заплатит клиент (округлено до 2 знаков)
  */
 function calculateTotalMortgage(percent, contribution, amount, countMonths) {
-    // Проверяем входные данные на корректность
+    // Проверяем входные данные
     if (
         typeof percent !== 'number' ||
         typeof contribution !== 'number' ||
@@ -53,29 +53,29 @@ function calculateTotalMortgage(percent, contribution, amount, countMonths) {
         return 0;
     }
 
-    // Преобразуем годовую процентную ставку в месячную (в долях единицы)
+    // Преобразуем годовую ставку в месячную (в долях единицы)
     const monthlyRate = (percent / 100) / 12;
 
-    // Вычисляем тело кредита (сумму, которую нужно вернуть банку)
+    // Тело кредита (сумма, которую нужно вернуть банку)
     const loanAmount = amount - contribution;
 
-    // Если тело кредита <= 0, клиент уже покрыл сумму взносом
+    // Если тело кредита <= 0, клиент ничего не должен банку
     if (loanAmount <= 0) {
-        return Number(contribution.toFixed(2));
+        return 0;
     }
 
-    // Рассчитываем ежемесячный платёж по формуле:
-    // Платёж = S * (P + P / ((1 + P)^n - 1))
-    // где: S — тело кредита, P — месячная ставка, n — количество месяцев
+    // Исправленная формула аннуитетного платежа:
+    // Платёж = S * (P * (1 + P)^n) / ((1 + P)^n - 1)
     const payment = loanAmount * (
-        monthlyRate + (monthlyRate / (Math.pow(1 + monthlyRate, countMonths) - 1))
+        (monthlyRate * Math.pow(1 + monthlyRate, countMonths)) /
+        (Math.pow(1 + monthlyRate, countMonths) - 1)
     );
 
-    // Общая сумма выплат по кредиту
+    // Общая сумма выплат по кредиту (без учёта взноса)
     const totalPayment = payment * countMonths;
 
-    // Итоговая сумма: взнос + выплаты по кредиту
-    const totalAmount = contribution + totalPayment;
+    // Итоговая сумма: только выплаты по кредиту
+    const totalAmount = totalPayment;
 
     // Округляем до двух знаков после запятой и возвращаем число
     return Number(totalAmount.toFixed(2));
