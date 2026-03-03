@@ -1,25 +1,34 @@
 "use strict";
 
-function solveEquation(a, b, c) {
-    // Вычисляем дискриминант по формуле D = b² - 4ac
-    const d = b ** 2 - 4 * a * c;
-
-
-    // Если дискриминант меньше нуля — корней нет
-    if (d < 0) {
-        return [];
+function calculateTotalMortgage(percent, contribution, amount, countMonths) {
+    // Проверяем входные данные
+    if (percent <= 0 || contribution < 0 || amount <= 0 || countMonths <= 0) {
+        return 0;
     }
 
-    // Если дискриминант равен нулю — один корень
-    if (d === 0) {
-        const root = -b / (2 * a);
-        return [root];
+    // Преобразуем процентную ставку: из % в долю, из годовой в месячную
+    const monthlyRate = (percent / 100) / 12;
+
+    // Тело кредита (сумма, которую нужно вернуть банку)
+    const loanAmount = amount - contribution;
+
+    // Если тело кредита <= 0, клиент ничего не должен
+    if (loanAmount <= 0) {
+        return Number(contribution.toFixed(2));
     }
 
-    // Если дискриминант больше нуля — два корня
-    const sqrtD = Math.sqrt(d);
-    const root1 = (-b + sqrtD) / (2 * a);
-    const root2 = (-b - sqrtD) / (2 * a);
+    // Ежемесячный платёж по формуле:
+    // Платёж = S * (P + (P / (((1 + P)^n) - 1)))
+    const payment = loanAmount * (
+        monthlyRate + (monthlyRate / (Math.pow(1 + monthlyRate, countMonths) - 1))
+    );
 
-    return [root1, root2];
+    // Общая сумма выплат (ежемесячный платёж * количество месяцев)
+    const totalPayment = payment * countMonths;
+
+    // Итоговая сумма: первоначальный взнос + общая сумма выплат по кредиту
+    const totalAmount = contribution + totalPayment;
+
+    // Округляем до двух знаков после запятой и возвращаем число
+    return Number(totalAmount.toFixed(2));
 }
