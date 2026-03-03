@@ -39,7 +39,7 @@ function solveEquation(a, b, c) {
  * @returns {number} общая сумма, которую заплатит клиент (округлено до 2 знаков)
  */
 function calculateTotalMortgage(percent, contribution, amount, countMonths) {
-    // Проверяем входные данные
+    // Валидация входных данных
     if (
         typeof percent !== 'number' ||
         typeof contribution !== 'number' ||
@@ -53,18 +53,18 @@ function calculateTotalMortgage(percent, contribution, amount, countMonths) {
         return 0;
     }
 
-    // Преобразуем годовую ставку в месячную (в долях единицы)
+    // Месячная процентная ставка (в долях единицы)
     const monthlyRate = (percent / 100) / 12;
 
-    // Тело кредита (сумма, которую нужно вернуть банку)
+    // Тело кредита: сумма, которую нужно вернуть банку
     const loanAmount = amount - contribution;
 
-    // Если тело кредита <= 0, клиент ничего не должен банку
+    // Если кредит полностью покрыт взносом — клиент ничего не должен
     if (loanAmount <= 0) {
-        return 0;
+        return 0; // Исправлено: возвращаем 0, а не contribution
     }
 
-    // Исправленная формула аннуитетного платежа:
+    // Аннуитетный платёж по формуле:
     // Платёж = S * (P * (1 + P)^n) / ((1 + P)^n - 1)
     const payment = loanAmount * (
         (monthlyRate * Math.pow(1 + monthlyRate, countMonths)) /
@@ -75,6 +75,7 @@ function calculateTotalMortgage(percent, contribution, amount, countMonths) {
     const totalPayment = payment * countMonths;
 
     // Итоговая сумма: только выплаты по кредиту
+    // Взнос уже учтён в loanAmount, повторно его не добавляем!
     const totalAmount = totalPayment;
 
     // Округляем до двух знаков после запятой и возвращаем число
